@@ -29,6 +29,7 @@ public class Follower {
                     Player thisPlayerFollows = Bukkit.getServer().getPlayer(configHelper.getFollowerUUID());
                     if(thisPlayerFollows != null){
                         if(Bukkit.getServer().getOfflinePlayer(configHelper.getFollowThisUUID()).isOnline()){
+                            tick = 0;
                             Player followThisPlayer = Bukkit.getServer().getPlayer(configHelper.getFollowThisUUID());
                             if(followThisPlayer != null && followThisPlayer.isOnline()){
                                 if(thisPlayerFollows.getSpectatorTarget() != followThisPlayer){
@@ -48,26 +49,22 @@ public class Follower {
                         }else{
                             ++tick;
 
-                            Location loc = getLocationAroundCircle(c, configHelper.getCenterFollowRadius(), configHelper.getCenterFollowRadPerTick() * tick);
+                            Location loc = getLocationAroundCircle(c, configHelper.getCenterFollowRadius(), configHelper.getCenterFollowRadPerTick() * tick, configHelper.getCenterHeightOffset());
                             thisPlayerFollows.setVelocity(new Vector(1, 0, 0));
-                            thisPlayerFollows.teleport(loc.add(0, configHelper.getCenterHeightOffset(), 0));
-
-
-                            thisPlayerFollows.lookAt(c.getBlockX(),c.getBlockY(),c.getBlockZ(), LookAnchor.EYES);
+                            thisPlayerFollows.teleport(loc);
                         }
                     }
                 }
             }.runTaskTimer(plugin, 0, 1);
         }
     }
-    public static Location getLocationAroundCircle(Location center, double radius, double angleInRadian) {
+    public static Location getLocationAroundCircle(Location center, double radius, double angleInRadian, double yOffSet) {
         double x = center.getX() + radius * Math.cos(angleInRadian);
         double z = center.getZ() + radius * Math.sin(angleInRadian);
-        double y = center.getY();
+        double y = center.getY() + yOffSet;
 
         Location loc = new Location(center.getWorld(), x, y, z);
-        Vector difference = center.toVector().clone().subtract(loc.toVector()); // this sets the returned location's direction toward the center of the circle
-        loc.setDirection(difference);
+        loc.setDirection(center.toVector().subtract(loc.toVector()).normalize());
 
         return loc;
     }
