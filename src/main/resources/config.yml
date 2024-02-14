@@ -1,0 +1,11 @@
+followThisUUID: 00000000-0000-0000-0000-000000000000
+followerUUID: 00000000-0000-0000-0000-000000000000
+fallbackFollowThisLocation: world, 0, 64, 0
+
+playerFollowRadius: 10
+playerFollowRadPerSec: 1.5
+playerHeightOffset: 0
+
+centerFollowRadius: 100
+centerFollowRadPerSec: 1.5
+centerHeightOffset: 10
