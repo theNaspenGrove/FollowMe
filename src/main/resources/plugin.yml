@@ -1,0 +1,4 @@
+name: FollowMe
+version: '${project.version}'
+main: mov.naspen.followme.FollowMe
+api-version: '1.20'
