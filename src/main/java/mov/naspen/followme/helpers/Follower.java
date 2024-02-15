@@ -38,7 +38,7 @@ public class Follower {
                                             thisPlayerFollows.setSpectatorTarget(followThisPlayer),
                                             4);
                                 }else if(thisPlayerFollows.getLocation().getWorld() != followThisPlayer.getLocation().getWorld() ||
-                                        thisPlayerFollows.getLocation().distance(followThisPlayer.getLocation()) > 1){
+                                        thisPlayerFollows.getLocation().distance(followThisPlayer.getLocation()) > 3){
                                     thisPlayerFollows.setSpectatorTarget(null);
                                     Bukkit.getScheduler().runTaskLater(plugin, () ->
                                                     thisPlayerFollows.setSpectatorTarget(followThisPlayer),
