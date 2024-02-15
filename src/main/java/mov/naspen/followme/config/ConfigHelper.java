@@ -16,8 +16,8 @@ public class ConfigHelper {
     private final double playerHeightOffset;
     private final double centerFollowRadius;
     private final double centerFollowRadPerTick;
-
     private final double centerHeightOffset;
+    public boolean useEssentials = false;
 
     public ConfigHelper(FileConfiguration config){
         followThisUUID = UUID.fromString(config.getString("followThisUUID") != null ? config.getString("followThisUUID") : "00000000-0000-0000-0000-000000000000");

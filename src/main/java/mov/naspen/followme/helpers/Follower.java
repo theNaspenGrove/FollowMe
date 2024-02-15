@@ -2,14 +2,17 @@ package mov.naspen.followme.helpers;
 
 import io.papermc.paper.entity.LookAnchor;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
-import static mov.naspen.followme.FollowMe.configHelper;
-import static mov.naspen.followme.FollowMe.plugin;
+import javax.annotation.Nullable;
+import java.util.Objects;
+
+import static mov.naspen.followme.FollowMe.*;
 
 public class Follower {
 
@@ -28,27 +31,17 @@ public class Follower {
                     }
                     Player thisPlayerFollows = Bukkit.getServer().getPlayer(configHelper.getFollowerUUID());
                     if(thisPlayerFollows != null){
-                        if(Bukkit.getServer().getOfflinePlayer(configHelper.getFollowThisUUID()).isOnline()){
-                            tick = 0;
+                        if(canFollow(Bukkit.getServer().getPlayer(configHelper.getFollowThisUUID()))){
                             Player followThisPlayer = Bukkit.getServer().getPlayer(configHelper.getFollowThisUUID());
-                            if(followThisPlayer != null && followThisPlayer.isOnline()){
-                                if(thisPlayerFollows.getSpectatorTarget() != followThisPlayer){
-                                    thisPlayerFollows.teleport(followThisPlayer);
-                                    Bukkit.getScheduler().runTaskLater(plugin, () ->
-                                            thisPlayerFollows.setSpectatorTarget(followThisPlayer),
-                                            4);
-                                }else if(thisPlayerFollows.getLocation().getWorld() != followThisPlayer.getLocation().getWorld() ||
-                                        thisPlayerFollows.getLocation().distance(followThisPlayer.getLocation()) > 3){
-                                    thisPlayerFollows.setSpectatorTarget(null);
-                                    Bukkit.getScheduler().runTaskLater(plugin, () ->
-                                                    thisPlayerFollows.setSpectatorTarget(followThisPlayer),
-                                            4);
-                                }
+                            tick = 0;
+                            if(isAttached(thisPlayerFollows, followThisPlayer)){
+                                Spectate(thisPlayerFollows, followThisPlayer);
                             }
-
                         }else{
+                            if(tick == 0){
+                                thisPlayerFollows.setSpectatorTarget(null);
+                            }
                             ++tick;
-
                             Location loc = getLocationAroundCircle(c, configHelper.getCenterFollowRadius(), configHelper.getCenterFollowRadPerTick() * tick, configHelper.getCenterHeightOffset());
                             thisPlayerFollows.setVelocity(new Vector(1, 0, 0));
                             thisPlayerFollows.teleport(loc);
@@ -67,5 +60,25 @@ public class Follower {
         loc.setDirection(center.toVector().subtract(loc.toVector()).normalize());
 
         return loc;
+    }
+
+    private static void Spectate(Player thisPlayerFollows, Player followThisPlayer) {
+        thisPlayerFollows.setSpectatorTarget(null);
+        thisPlayerFollows.teleport(followThisPlayer);
+        Bukkit.getScheduler().runTaskLater(plugin, () ->
+                        thisPlayerFollows.setSpectatorTarget(followThisPlayer),
+                4);
+    }
+
+    private static boolean isPlayerAFK(Player player){
+        return configHelper.useEssentials && ess.getUser(player).isAfk();
+    }
+
+    private static boolean isAttached(Player spectator, Player target){
+        return spectator.getSpectatorTarget() != target || spectator.getLocation().getWorld() != spectator.getLocation().getWorld() || spectator.getLocation().distance(target.getLocation()) > 3;
+    }
+
+    private static boolean canFollow(Player player){
+        return player != null && player.isOnline() && !isPlayerAFK(player) && player.getGameMode() == GameMode.SURVIVAL;
     }
 }

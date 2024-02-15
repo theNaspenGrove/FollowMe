@@ -6,7 +6,7 @@
 
   <groupId>mov.naspen</groupId>
   <artifactId>FollowMe</artifactId>
-  <version>0.2</version>
+  <version>0.3</version>
   <packaging>jar</packaging>
 
   <name>FollowMe</name>
@@ -49,6 +49,10 @@
           <id>github</id>
           <url>https://maven.pkg.github.com/theNaspenGrove/Periderm/</url>
       </repository>
+      <repository>
+          <id>essentials-releases</id>
+          <url>https://repo.essentialsx.net/releases/</url>
+      </repository>
   </repositories>
 
   <dependencies>
@@ -62,6 +66,18 @@
           <groupId>mov.naspen</groupId>
           <artifactId>periderm</artifactId>
           <version>2.2</version>
+      </dependency>
+      <dependency>
+          <groupId>net.essentialsx</groupId>
+          <artifactId>EssentialsX</artifactId>
+          <version>2.19.0</version>
+          <scope>provided</scope>
+          <exclusions>
+              <exclusion>
+                  <groupId>org.bstats</groupId>
+                  <artifactId>bstats-bukkit</artifactId>
+              </exclusion>
+          </exclusions>
       </dependency>
   </dependencies>
 </project>
