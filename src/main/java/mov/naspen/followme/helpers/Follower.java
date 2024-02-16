@@ -75,7 +75,7 @@ public class Follower {
     }
 
     private static boolean isAttached(Player spectator, Player target){
-        return spectator.getSpectatorTarget() != target || spectator.getLocation().getWorld() != spectator.getLocation().getWorld() || spectator.getLocation().distance(target.getLocation()) > 3;
+        return spectator.getSpectatorTarget() != target || spectator.getLocation().getWorld() != target.getLocation().getWorld() || spectator.getLocation().distance(target.getLocation()) > 3;
     }
 
     private static boolean canFollow(Player player){
