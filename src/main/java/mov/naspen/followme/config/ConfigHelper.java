@@ -1,35 +1,29 @@
 package mov.naspen.followme.config;
 
+import mov.naspen.followme.helpers.LocationTarget;
 import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
+import static mov.naspen.followme.FollowMe.logHelper;
 import static mov.naspen.followme.FollowMe.plugin;
 
 public class ConfigHelper {
     private final UUID followThisUUID;
     private final UUID followerUUID;
-    private Location fallbackFollowThisLocation;
-    private final double playerFollowRadius;
-    private double playerFollowRadPerTick;
-    private final double playerHeightOffset;
-    private final double centerFollowRadius;
-    private final double centerFollowRadPerTick;
-    private final double centerHeightOffset;
+    private List<LocationTarget> locationTargets;
     public boolean useEssentials = false;
+    private int maxTimePerLocationInTicks;
 
     public ConfigHelper(FileConfiguration config){
         followThisUUID = UUID.fromString(config.getString("followThisUUID") != null ? config.getString("followThisUUID") : "00000000-0000-0000-0000-000000000000");
         followerUUID = UUID.fromString(config.getString("followerUUID") != null ? config.getString("followerUUID") : "00000000-0000-0000-0000-000000000000");
-        fallbackFollowThisLocation = config.getLocation("fallbackFollowThisLocation") != null ? config.getLocation("fallbackFollowThisLocation") : new Location(null, 0, 0, 0);
-        playerFollowRadius = config.getDouble("playerFollowRadius") != 0 ? config.getDouble("playerFollowRadius") : 10;
-        playerFollowRadPerTick = config.getDouble("playerFollowRadPerSec") != 0 ? config.getDouble("playerFollowRadPerSec") / 20f : 0.5 / 20f;
-        playerHeightOffset = config.getDouble("playerHeightOffset") != 0 ? config.getDouble("playerHeightOffset") : 0;
-        centerFollowRadius = config.getDouble("centerFollowRadius") != 0 ? config.getDouble("centerFollowRadius") : 100;
-        centerFollowRadPerTick = config.getDouble("centerFollowRadPerSec") != 0 ? config.getDouble("centerFollowRadPerSec") / 20f : 0.1 / 20f;
-        centerHeightOffset = config.getDouble("centerHeightOffset") != 0 ? config.getDouble("centerHeightOffset") : 10;
-
+        maxTimePerLocationInTicks = config.getInt("maxTimePerLocationInSeconds") != 0 ? config.getInt("maxTimePerLocationInSeconds") * 20 : 6000;
+        loadLocationTargets();
     }
 
     public UUID getFollowThisUUID() {
@@ -40,49 +34,29 @@ public class ConfigHelper {
         return followerUUID;
     }
 
-    public double getPlayerFollowRadius() {
-        return playerFollowRadius;
+    public int getMaxTimePerLocationInTicks() {
+        return maxTimePerLocationInTicks;
     }
 
-    public double getPlayerFollowRadPerTick() {
-        return playerFollowRadPerTick;
+    public void loadLocationTargets(){
+        if(plugin.getConfig().get("locationTargets") != null){
+            //load location targets from the serialized configuration map in the config file
+            //loop through the map and add each location target to the locationTargets array
+            locationTargets = (List<LocationTarget>) plugin.getConfig().getList("locationTargets");
+        }else {
+            logHelper.sendLogInfo("No location targets found");
+            locationTargets = new ArrayList<>();
+            addFallbackLocation(plugin.getServer().getWorlds().get(0).getSpawnLocation(), 40, 20, 0.1, false);
+        }
     }
 
-    public void setPlayerFollowRadPerTick(double radPerSec){
-        playerFollowRadPerTick = radPerSec / 20f;
-        plugin.getConfig().set("playerFollowRadPerSec", radPerSec);
-        plugin.saveConfig();
+    public List<LocationTarget> getLocationTargets() {
+        return locationTargets;
     }
 
-    public void setCenterFollowRadPerTick(double radPerSec){
-        playerFollowRadPerTick = radPerSec / 20f;
-        plugin.getConfig().set("playerFollowRadPerSec", radPerSec);
-        plugin.saveConfig();
-    }
-
-    public double getPlayerHeightOffset(){
-        return playerHeightOffset;
-    }
-
-    public double getCenterFollowRadius() {
-        return centerFollowRadius;
-    }
-
-    public double getCenterFollowRadPerTick() {
-        return centerFollowRadPerTick;
-    }
-
-    public double getCenterHeightOffset(){
-        return centerHeightOffset;
-    }
-
-    public Location getFallbackFollowThisLocation() {
-        return fallbackFollowThisLocation;
-    }
-
-    public void setFallbackFollowThisLocation(Location location){
-        fallbackFollowThisLocation = location;
-        plugin.getConfig().set("fallbackFollowThisLocation", location);
+    public void addFallbackLocation(Location location, double radius, int yOffset, double radPerSec, boolean invertedLook){
+        locationTargets.add(new LocationTarget(location, radius, yOffset, radPerSec, invertedLook));
+        plugin.getConfig().set("locationTargets", locationTargets);
         plugin.saveConfig();
     }
 

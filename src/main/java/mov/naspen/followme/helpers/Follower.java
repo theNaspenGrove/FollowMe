@@ -11,6 +11,7 @@ import org.bukkit.util.Vector;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
+import java.util.Random;
 
 import static mov.naspen.followme.FollowMe.*;
 
@@ -22,7 +23,8 @@ public class Follower {
         if(task == null || task.isCancelled()){
             task = new BukkitRunnable() {
                 int tick = 0;
-                final Location c = configHelper.getFallbackFollowThisLocation();
+                int maxTick = 0;
+                LocationTarget currentLocationTarget;
 
                 @Override
                 public void run() {
@@ -38,11 +40,17 @@ public class Follower {
                                 Spectate(thisPlayerFollows, followThisPlayer);
                             }
                         }else{
-                            if(tick == 0){
+                            if(tick == 0 || maxTick == 0){
                                 thisPlayerFollows.setSpectatorTarget(null);
+                                int rnd = new Random().nextInt(configHelper.getLocationTargets().size());
+                                currentLocationTarget = configHelper.getLocationTargets().get(rnd);
+                                maxTick = (new Random().nextInt(configHelper.getMaxTimePerLocationInTicks() - 1200) + 1200);
+                                tick = 0;
                             }
                             ++tick;
-                            Location loc = getLocationAroundCircle(c, configHelper.getCenterFollowRadius(), configHelper.getCenterFollowRadPerTick() * tick, configHelper.getCenterHeightOffset());
+                            --maxTick;
+                            // Location loc = getLocationAroundCircle(c, configHelper.getCenterFollowRadius(), configHelper.getCenterFollowRadPerTick() * tick, configHelper.getCenterHeightOffset());
+                            Location loc = currentLocationTarget.getLocationAroundCircle(tick);
                             thisPlayerFollows.setVelocity(new Vector(1, 0, 0));
                             thisPlayerFollows.teleport(loc);
                         }
@@ -51,16 +59,16 @@ public class Follower {
             }.runTaskTimer(plugin, 0, 1);
         }
     }
-    public static Location getLocationAroundCircle(Location center, double radius, double angleInRadian, double yOffSet) {
-        double x = center.getX() + radius * Math.cos(angleInRadian);
-        double z = center.getZ() + radius * Math.sin(angleInRadian);
-        double y = center.getY() + yOffSet;
-
-        Location loc = new Location(center.getWorld(), x, y, z);
-        loc.setDirection(center.toVector().subtract(loc.toVector()).normalize());
-
-        return loc;
-    }
+//    public static Location getLocationAroundCircle(Location center, double radius, double angleInRadian, double yOffSet) {
+//        double x = center.getX() + radius * Math.cos(angleInRadian);
+//        double z = center.getZ() + radius * Math.sin(angleInRadian);
+//        double y = center.getY() + yOffSet;
+//
+//        Location loc = new Location(center.getWorld(), x, y, z);
+//        loc.setDirection(center.toVector().subtract(loc.toVector()).normalize());
+//
+//        return loc;
+//    }
 
     private static void Spectate(Player thisPlayerFollows, Player followThisPlayer) {
         thisPlayerFollows.setSpectatorTarget(null);
