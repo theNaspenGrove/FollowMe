@@ -33,7 +33,6 @@ public class commands implements CommandExecutor {
                     }
                 }
             }
-
         }
         return false;
     }

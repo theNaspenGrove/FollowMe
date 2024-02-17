@@ -18,11 +18,13 @@ public class ConfigHelper {
     private List<LocationTarget> locationTargets;
     public boolean useEssentials = false;
     private int maxTimePerLocationInTicks;
+    private int reAttachRadius = 3;
 
     public ConfigHelper(FileConfiguration config){
         followThisUUID = UUID.fromString(config.getString("followThisUUID") != null ? config.getString("followThisUUID") : "00000000-0000-0000-0000-000000000000");
         followerUUID = UUID.fromString(config.getString("followerUUID") != null ? config.getString("followerUUID") : "00000000-0000-0000-0000-000000000000");
         maxTimePerLocationInTicks = config.getInt("maxTimePerLocationInSeconds") != 0 ? config.getInt("maxTimePerLocationInSeconds") * 20 : 6000;
+        reAttachRadius = config.getInt("reAttachRadius") != 0 ? config.getInt("reAttachRadius") : 5;
         loadLocationTargets();
     }
 
@@ -36,6 +38,10 @@ public class ConfigHelper {
 
     public int getMaxTimePerLocationInTicks() {
         return maxTimePerLocationInTicks;
+    }
+
+    public int getReAttachRadius() {
+        return reAttachRadius;
     }
 
     public void loadLocationTargets(){
