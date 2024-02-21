@@ -1,6 +1,5 @@
-package mov.naspen.followme.helpers;
+package mov.naspen.naspanopticam.helpers;
 
-import mov.naspen.followme.config.ConfigHelper;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -8,7 +7,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import static mov.naspen.followme.FollowMe.*;
+import static mov.naspen.naspanopticam.NasPanoptiCam.*;
 
 public class commands implements CommandExecutor {
     @Override
@@ -16,7 +15,7 @@ public class commands implements CommandExecutor {
         if(!(sender instanceof Player)){
             return false;
         }
-        if(command.getName().equals("followme")){
+        if(command.getName().equals("naspanopticam")){
             if(args.length == 0){
                 return false;
             } else {
@@ -27,13 +26,13 @@ public class commands implements CommandExecutor {
                             sender.sendMessage("Added location to the list of locations");
                             return true;
                         }else{
-                            sender.sendMessage("usage /followme add location <X> <Y> <Z> <radius> <yOffset> <radPerSec> <invertedLook>");
+                            sender.sendMessage("usage /naspanopticam add location <X> <Y> <Z> <radius> <yOffset> <radPerSec> <invertedLook>");
                             return false;
                         }
                     }
                 }else if(args[0].equals("reload")){
                     configHelper.reloadConfig();
-                    sender.sendMessage("Reloaded the config");
+                    sender.sendMessage("Reloaded the NasPanoptiCam config");
                     return true;
                 }
             }

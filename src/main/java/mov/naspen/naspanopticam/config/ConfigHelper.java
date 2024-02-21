@@ -1,16 +1,15 @@
-package mov.naspen.followme.config;
+package mov.naspen.naspanopticam.config;
 
-import mov.naspen.followme.helpers.LocationTarget;
+import mov.naspen.naspanopticam.helpers.LocationTarget;
 import org.bukkit.Location;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static mov.naspen.followme.FollowMe.logHelper;
-import static mov.naspen.followme.FollowMe.plugin;
+import static mov.naspen.naspanopticam.NasPanoptiCam.logHelper;
+import static mov.naspen.naspanopticam.NasPanoptiCam.plugin;
 
 public class ConfigHelper {
     private UUID followThisUUID;

@@ -1,11 +1,11 @@
 name: FollowMe
 version: '${project.version}'
-main: mov.naspen.followme.FollowMe
+main: mov.naspen.naspanopticam.NasPanoptiCam
 api-version: '1.20'
 softdepend: [Essentials]
 commands:
-    followme:
-        description: FollowMe command
-        permission: followme.set
+    naspanopticam:
+        description: NasPanoptiCam command
+        permission: naspanopticam.set
         default: op
-        usage: /followme set
+        usage: /naspanopticam set

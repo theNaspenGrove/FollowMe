@@ -1,6 +1,5 @@
-package mov.naspen.followme.helpers;
+package mov.naspen.naspanopticam.helpers;
 
-import io.papermc.paper.entity.LookAnchor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -9,11 +8,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
-import javax.annotation.Nullable;
-import java.util.Objects;
 import java.util.Random;
 
-import static mov.naspen.followme.FollowMe.*;
+import static mov.naspen.naspanopticam.NasPanoptiCam.*;
 
 public class Follower {
 

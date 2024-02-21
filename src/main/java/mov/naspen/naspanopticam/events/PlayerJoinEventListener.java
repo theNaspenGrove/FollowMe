@@ -1,13 +1,11 @@
-package mov.naspen.followme.events;
+package mov.naspen.naspanopticam.events;
 
-import mov.naspen.followme.helpers.Follower;
-import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import static mov.naspen.followme.FollowMe.*;
-import static mov.naspen.followme.helpers.Follower.Follow;
+import static mov.naspen.naspanopticam.NasPanoptiCam.*;
+import static mov.naspen.naspanopticam.helpers.Follower.Follow;
 
 public class PlayerJoinEventListener implements Listener {
 

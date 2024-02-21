@@ -5,11 +5,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>mov.naspen</groupId>
-  <artifactId>FollowMe</artifactId>
-  <version>0.4</version>
+  <artifactId>NasPanoptiCam</artifactId>
+  <version>0.5</version>
   <packaging>jar</packaging>
 
-  <name>FollowMe</name>
+  <name>NasPanoptiCam</name>
 
   <properties>
     <java.version>17</java.version>

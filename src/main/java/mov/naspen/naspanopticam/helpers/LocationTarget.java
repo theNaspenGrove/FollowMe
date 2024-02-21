@@ -1,4 +1,4 @@
-package mov.naspen.followme.helpers;
+package mov.naspen.naspanopticam.helpers;
 
 import org.bukkit.Location;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
