@@ -13,19 +13,29 @@ import static mov.naspen.followme.FollowMe.logHelper;
 import static mov.naspen.followme.FollowMe.plugin;
 
 public class ConfigHelper {
-    private final UUID followThisUUID;
-    private final UUID followerUUID;
+    private UUID followThisUUID;
+    private UUID followerUUID;
     private List<LocationTarget> locationTargets;
     public boolean useEssentials = false;
     private int maxTimePerLocationInTicks;
     private int reAttachRadius = 3;
 
     public ConfigHelper(FileConfiguration config){
+        loadValuesFromConfig(config);
+        loadLocationTargets(config);
+    }
+
+    private void loadValuesFromConfig(FileConfiguration config){
         followThisUUID = UUID.fromString(config.getString("followThisUUID") != null ? config.getString("followThisUUID") : "00000000-0000-0000-0000-000000000000");
         followerUUID = UUID.fromString(config.getString("followerUUID") != null ? config.getString("followerUUID") : "00000000-0000-0000-0000-000000000000");
         maxTimePerLocationInTicks = config.getInt("maxTimePerLocationInSeconds") != 0 ? config.getInt("maxTimePerLocationInSeconds") * 20 : 6000;
         reAttachRadius = config.getInt("reAttachRadius") != 0 ? config.getInt("reAttachRadius") : 5;
-        loadLocationTargets();
+    }
+
+    public void reloadConfig(){
+        plugin.reloadConfig();
+        loadValuesFromConfig(plugin.getConfig());
+        loadLocationTargets(plugin.getConfig());
     }
 
     public UUID getFollowThisUUID() {
@@ -44,11 +54,9 @@ public class ConfigHelper {
         return reAttachRadius;
     }
 
-    public void loadLocationTargets(){
+    public void loadLocationTargets(FileConfiguration config){
         if(plugin.getConfig().get("locationTargets") != null){
-            //load location targets from the serialized configuration map in the config file
-            //loop through the map and add each location target to the locationTargets array
-            locationTargets = (List<LocationTarget>) plugin.getConfig().getList("locationTargets");
+            locationTargets = (List<LocationTarget>) config.getList("locationTargets");
         }else {
             logHelper.sendLogInfo("No location targets found");
             locationTargets = new ArrayList<>();
@@ -60,8 +68,8 @@ public class ConfigHelper {
         return locationTargets;
     }
 
-    public void addFallbackLocation(Location location, double radius, int yOffset, double radPerSec, boolean invertedLook){
-        locationTargets.add(new LocationTarget(location, radius, yOffset, radPerSec, invertedLook));
+    public void addFallbackLocation(Location location, double radius, int yOffset, double radPerTick, boolean invertedLook){
+        locationTargets.add(new LocationTarget(location, radius, yOffset, radPerTick, invertedLook));
         plugin.getConfig().set("locationTargets", locationTargets);
         plugin.saveConfig();
     }

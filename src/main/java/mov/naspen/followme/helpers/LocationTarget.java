@@ -16,11 +16,11 @@ public class LocationTarget implements ConfigurationSerializable {
     private final double radPerTick;
     private final boolean invertedLook;
 
-    public LocationTarget(Location centerLocation, double radius, int yOffset, double radPerSec, boolean invertedLook) {
+    public LocationTarget(Location centerLocation, double radius, int yOffset, double radPerTick, boolean invertedLook) {
         this.centerLocation = centerLocation;
         this.radius = radius;
         this.yOffset = yOffset;
-        this.radPerTick = radPerSec / 20f;
+        this.radPerTick = radPerTick;
         this.invertedLook = invertedLook;
     }
 

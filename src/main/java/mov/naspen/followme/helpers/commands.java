@@ -1,5 +1,6 @@
 package mov.naspen.followme.helpers;
 
+import mov.naspen.followme.config.ConfigHelper;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -7,8 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import static mov.naspen.followme.FollowMe.configHelper;
-import static mov.naspen.followme.FollowMe.logHelper;
+import static mov.naspen.followme.FollowMe.*;
 
 public class commands implements CommandExecutor {
     @Override
@@ -19,11 +19,11 @@ public class commands implements CommandExecutor {
         if(command.getName().equals("followme")){
             if(args.length == 0){
                 return false;
-            } else if (args.length > 1) {
+            } else {
                 if(args[0].equals("add")){
                     if(args[1].equals("location")){
                         if(args.length == 9 && parseArgs(args)){
-                            configHelper.addFallbackLocation(parseLocation(sender,args), Double.parseDouble(args[5]), Integer.parseInt(args[6]), Double.parseDouble(args[7]), Boolean.parseBoolean(args[8]));
+                            configHelper.addFallbackLocation(parseLocation(sender,args), Double.parseDouble(args[5]), Integer.parseInt(args[6]), Double.parseDouble(args[7]) / 20f, Boolean.parseBoolean(args[8]));
                             sender.sendMessage("Added location to the list of locations");
                             return true;
                         }else{
@@ -31,6 +31,10 @@ public class commands implements CommandExecutor {
                             return false;
                         }
                     }
+                }else if(args[0].equals("reload")){
+                    configHelper.reloadConfig();
+                    sender.sendMessage("Reloaded the config");
+                    return true;
                 }
             }
         }
