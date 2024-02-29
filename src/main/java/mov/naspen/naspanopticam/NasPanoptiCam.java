@@ -4,6 +4,7 @@ import com.earth2me.essentials.Essentials;
 import mov.naspen.naspanopticam.config.ConfigHelper;
 import mov.naspen.naspanopticam.events.PlayerJoinEventListener;
 import mov.naspen.naspanopticam.helpers.LocationTarget;
+import mov.naspen.naspanopticam.helpers.NasPanoptiPlaceholders;
 import mov.naspen.naspanopticam.helpers.command.CommandHandler;
 import mov.naspen.naspanopticam.helpers.command.TabCompleteHandler;
 import mov.naspen.periderm.helpers.luckPerms.AspenLuckPermsHelper;
@@ -48,6 +49,12 @@ public final class NasPanoptiCam extends JavaPlugin {
 
         Objects.requireNonNull(this.getCommand("naspanopticam")).setExecutor(new CommandHandler());
         Objects.requireNonNull(this.getCommand("naspanopticam")).setTabCompleter(new TabCompleteHandler());
+
+        //create PlaceHolder API expansion
+        if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new NasPanoptiPlaceholders(this).register();
+            logHelper.sendLogInfo("Placeholders holding!");
+        }
 
         logHelper.sendLogInfo("Plugin enabled");
     }
