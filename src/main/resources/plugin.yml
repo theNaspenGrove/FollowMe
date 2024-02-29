@@ -1,11 +1,27 @@
-name: FollowMe
+name: NasPanoptiCam
 version: '${project.version}'
 main: mov.naspen.naspanopticam.NasPanoptiCam
 api-version: '1.20'
 softdepend: [Essentials]
+depend: [LuckPerms]
 commands:
     naspanopticam:
-        description: NasPanoptiCam command
-        permission: naspanopticam.set
-        default: op
-        usage: /naspanopticam set
+        description: Manage the NasPanoptiCam plugin
+        usage: /naspanopticam <args>
+    dontfollowme:
+        description: Prevents the player from being followed by the follower account
+        usage: /dontfollowme
+    followme:
+        description: Allows the player to be followed by the follower account
+        usage: /followme
+
+permissions:
+    aspanopticam.add:
+        description: ability to use the add command
+        default: false
+    naspanopticam.add.location:
+        description: ability to use the add location command
+        default: false
+    naspanopticam.reload:
+        description: ability to use the reload command
+        default: false
