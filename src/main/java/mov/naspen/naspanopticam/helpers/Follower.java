@@ -56,8 +56,10 @@ public class Follower {
                             if(followThisPlayer != null && followThisPlayer.isOnline() && followThisPlayer != Bukkit.getServer().getPlayer(configHelper.getFollowThisUUID())) {
                                 followThisPlayer.sendMessage("You are no longer being watched by NasPanoptiCam.");
                             }
-                            if(notReset()) reset();
-                            followThisPlayer = Bukkit.getServer().getPlayer(configHelper.getFollowThisUUID());
+                            if(followThisPlayer != Bukkit.getServer().getPlayer(configHelper.getFollowThisUUID())){
+                                if(notReset()) reset();
+                                followThisPlayer = Bukkit.getServer().getPlayer(configHelper.getFollowThisUUID());
+                            }
                             if(isNotAttached(thisPlayerFollows, followThisPlayer)){
                                 Spectate(thisPlayerFollows, followThisPlayer);
                             }
@@ -105,8 +107,6 @@ public class Follower {
                         thisPlayerFollows.setSpectatorTarget(followThisPlayer),
                 4);
     }
-
-
 
     private static boolean isPlayerAFK(Player player){
         return configHelper.useEssentials && ess.getUser(player).isAfk();
