@@ -47,6 +47,7 @@ public class LocationFollower {
 
     public void stopFollowing() {
         this.locationFollowerTask.cancel();
+        tick = 0;
     }
 
     public boolean tick() {
