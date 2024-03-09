@@ -1,6 +1,6 @@
 package mov.naspen.naspanopticam.config;
 
-import mov.naspen.naspanopticam.helpers.LocationTarget;
+import mov.naspen.naspanopticam.helpers.target.LocationTarget;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 

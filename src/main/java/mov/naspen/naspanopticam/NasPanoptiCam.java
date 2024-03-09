@@ -3,7 +3,8 @@ package mov.naspen.naspanopticam;
 import com.earth2me.essentials.Essentials;
 import mov.naspen.naspanopticam.config.ConfigHelper;
 import mov.naspen.naspanopticam.events.PlayerJoinEventListener;
-import mov.naspen.naspanopticam.helpers.LocationTarget;
+import mov.naspen.naspanopticam.helpers.follow.FollowerWatcher;
+import mov.naspen.naspanopticam.helpers.target.LocationTarget;
 import mov.naspen.naspanopticam.helpers.NasPanoptiPlaceholders;
 import mov.naspen.naspanopticam.helpers.command.CommandHandler;
 import mov.naspen.naspanopticam.helpers.command.TabCompleteHandler;
@@ -22,6 +23,7 @@ public final class NasPanoptiCam extends JavaPlugin {
     public static ConfigHelper configHelper;
     public static NasPanoptiCam plugin;
     public static Essentials ess;
+    public static FollowerWatcher followerWatcher;
     static {
         ConfigurationSerialization.registerClass(LocationTarget.class, "LocationTarget");
     }
@@ -41,6 +43,7 @@ public final class NasPanoptiCam extends JavaPlugin {
             logHelper.sendLogInfo("EssentialsX found");
         }
         logHelper.sendLogInfo(String.valueOf(configHelper.useEssentials));
+        followerWatcher = new FollowerWatcher();
 
         this.getServer().getPluginManager().registerEvents(new PlayerJoinEventListener(), this);
 

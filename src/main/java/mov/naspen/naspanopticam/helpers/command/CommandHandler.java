@@ -1,5 +1,6 @@
 package mov.naspen.naspanopticam.helpers.command;
 
+import mov.naspen.periderm.helpers.luckPerms.AspenMetaKey;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -8,9 +9,9 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import static mov.naspen.naspanopticam.NasPanoptiCam.*;
-import static mov.naspen.naspanopticam.helpers.Follower.*;
 
 public class CommandHandler implements CommandExecutor {
+    public static AspenMetaKey dontFollowMe = new AspenMetaKey("dontFollowMe");
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if(!(sender instanceof Player)){
@@ -78,9 +79,8 @@ public class CommandHandler implements CommandExecutor {
     }
 
     private static void dontFollowPlayer(Player player){
-        if( followThisPlayer == player){
-            followThisPlayer = null;
-            dismountThisPlayerFollows();
+        if(followerWatcher.getPlayerFollower().isFollowingPlayer(player)){
+            followerWatcher.getPlayerFollower().stopFollowing();
         }
         player.sendMessage("NasPanoptiCam will no longer select you as a target.");
         metaHelper.setMetaValue((Player) player, dontFollowMe, "true");
