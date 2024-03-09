@@ -39,7 +39,7 @@ public class NasPanoptiPlaceholders extends PlaceholderExpansion {
     @Override
     public String onRequest(OfflinePlayer p, String params) {
         if(params.equalsIgnoreCase("isBeingFollowed")){
-            if(followerWatcher.getPlayerFollower().isFollowing()) return "false";
+            if(!followerWatcher.getPlayerFollower().isFollowing()) return "false";
             return p.getUniqueId().equals(followerWatcher.getPlayerFollower().getPlayerTarget().getFollowThisPlayer().getUniqueId()) ? "true" : "false";
         }
         return null; // Placeholder is unknown by the Expansion
