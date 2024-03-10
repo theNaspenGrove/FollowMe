@@ -3,6 +3,7 @@ package mov.naspen.naspanopticam;
 import com.earth2me.essentials.Essentials;
 import mov.naspen.naspanopticam.config.ConfigHelper;
 import mov.naspen.naspanopticam.events.PlayerJoinEventListener;
+import mov.naspen.naspanopticam.events.PlayerQuitEventListener;
 import mov.naspen.naspanopticam.helpers.follow.FollowerWatcher;
 import mov.naspen.naspanopticam.helpers.target.LocationTarget;
 import mov.naspen.naspanopticam.helpers.NasPanoptiPlaceholders;
@@ -46,6 +47,7 @@ public final class NasPanoptiCam extends JavaPlugin {
         followerWatcher = new FollowerWatcher();
 
         this.getServer().getPluginManager().registerEvents(new PlayerJoinEventListener(), this);
+        this.getServer().getPluginManager().registerEvents(new PlayerQuitEventListener(), this);
 
         Objects.requireNonNull(this.getCommand("dontfollowme")).setExecutor(new CommandHandler());
         Objects.requireNonNull(this.getCommand("followme")).setExecutor(new CommandHandler());

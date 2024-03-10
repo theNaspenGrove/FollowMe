@@ -44,7 +44,7 @@ public class PlayerFollower {
             @Override
             public void run() {
                 //Check if the player is still online
-                if(playerTarget.tick()){
+                if(playerTarget.tick() || !followerWatcher.isPlayerFollowerOnline()){
                     stopFollowing();
                 }
             }

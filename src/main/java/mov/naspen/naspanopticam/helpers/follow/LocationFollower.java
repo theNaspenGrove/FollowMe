@@ -28,9 +28,14 @@ public class LocationFollower {
         locationFollowerTask = new BukkitRunnable(){
             @Override
             public void run() {
-                Location loc = locationTarget.getLocationAroundCircle(tick++);
-                followerWatcher.getThisPlayerFollows().setVelocity(new Vector(1, 0, 0));
-                followerWatcher.getThisPlayerFollows().teleport(loc);
+                if(followerWatcher.isPlayerFollowerOnline()){
+                    Location loc = locationTarget.getLocationAroundCircle(tick++);
+                    followerWatcher.getThisPlayerFollows().setVelocity(new Vector(1, 0, 0));
+                    followerWatcher.getThisPlayerFollows().teleport(loc);
+                }else{
+                    stopFollowing();
+                    followerWatcher.stopWatching();
+                }
             }
         }.runTaskTimer(plugin, 0, 1);
     }

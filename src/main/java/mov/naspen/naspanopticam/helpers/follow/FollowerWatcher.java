@@ -57,7 +57,7 @@ public class FollowerWatcher {
     private void tick() {
         thisPlayerFollows = Bukkit.getServer().getPlayer(configHelper.getFollowerUUID());
         //if follower is online
-        if (thisPlayerFollows != null && thisPlayerFollows.isOnline()) {
+        if (isPlayerFollowerOnline()) {
             //if can follow primary target
             if (canFollow(Bukkit.getServer().getPlayer(configHelper.getFollowThisUUID()))) {
                 Player p = Bukkit.getServer().getPlayer(configHelper.getFollowThisUUID());
@@ -78,6 +78,10 @@ public class FollowerWatcher {
                 }
             }
         }
+    }
+
+    public boolean isPlayerFollowerOnline(){
+        return thisPlayerFollows != null && thisPlayerFollows.isOnline();
     }
 
     private boolean isPlayerAFK(Player player){
