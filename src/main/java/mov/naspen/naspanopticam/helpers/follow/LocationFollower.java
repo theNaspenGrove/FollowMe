@@ -12,7 +12,6 @@ import static mov.naspen.naspanopticam.NasPanoptiCam.configHelper;
 import static mov.naspen.naspanopticam.NasPanoptiCam.plugin;
 
 public class LocationFollower {
-
     private final FollowerWatcher followerWatcher;
     private LocationTarget locationTarget;
     private BukkitTask locationFollowerTask;

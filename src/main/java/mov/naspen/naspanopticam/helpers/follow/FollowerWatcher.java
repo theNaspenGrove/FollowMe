@@ -62,7 +62,7 @@ public class FollowerWatcher {
             if (canFollow(Bukkit.getServer().getPlayer(configHelper.getFollowThisUUID()))) {
                 Player p = Bukkit.getServer().getPlayer(configHelper.getFollowThisUUID());
                 playerFollower.followPlayer(p);
-            } else if (!playerFollower.isFollowing() && getValidPlayers().findAny().isPresent()) {
+            } else if (playerFollower.isNotFollowing() && getValidPlayers().findAny().isPresent()) {
                 //if not check for players
                 Player[] validPlayers = getValidPlayers().toArray(Player[]::new);
                 int rnd = new Random().nextInt(validPlayers.length);
@@ -96,5 +96,9 @@ public class FollowerWatcher {
 
     private boolean canFollow(Player player){
         return player != null && player.isOnline() && !isPlayerAFK(player) && metaHelper.getMetaValue(player, dontFollowMe) == null;
+    }
+
+    public void sendPrivateMessage(Player player, String s){
+        thisPlayerFollows.chat("/msg " + player.getName() + " " + s);
     }
 }

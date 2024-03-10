@@ -8,8 +8,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.Random;
 
-import static mov.naspen.naspanopticam.NasPanoptiCam.configHelper;
-import static mov.naspen.naspanopticam.NasPanoptiCam.plugin;
+import static mov.naspen.naspanopticam.NasPanoptiCam.*;
 
 public class PlayerFollower {
 
@@ -30,12 +29,16 @@ public class PlayerFollower {
             this.startFollowing();
         }
         if(isNotAttached(followerWatcher.getThisPlayerFollows(), player)){
+            logHelper.sendLogInfo("Reattaching to player '" + player.getName() + "' because the player is not attached or too far away.");
             this.spectate(followerWatcher.getThisPlayerFollows(),player);
         }
     }
 
     private void startFollowing() {
         //Start following the player
+        followerWatcher.sendPrivateMessage(getPlayerToFollow(),"I am watching you...");
+        followerWatcher.sendPrivateMessage(getPlayerToFollow(),"You can opt out using /dontfollowme");
+        logHelper.sendLogInfo("Following player '" + playerTarget.getFollowThisPlayer().getName() + "'.");
         this.spectate(followerWatcher.getThisPlayerFollows(),playerTarget.getFollowThisPlayer());
         this.playerWatcherTask = new BukkitRunnable(){
             @Override
@@ -48,18 +51,19 @@ public class PlayerFollower {
         }.runTaskTimer(plugin, 0, 1);
     }
 
-    public PlayerTarget getPlayerTarget(){
-        return playerTarget;
+    public Player getPlayerToFollow(){
+        return playerTarget.getFollowThisPlayer();
     }
 
     public void stopFollowing(){
-        playerTarget.stopFollowing();
+        followerWatcher.sendPrivateMessage(getPlayerToFollow(),"I am no longer watching you.");
+        logHelper.sendLogInfo("Stopped following player '" + playerTarget.getFollowThisPlayer().getName() + "'.");
         this.dismount(followerWatcher.getThisPlayerFollows());
         playerWatcherTask.cancel();
     }
 
-    public boolean isFollowing(){
-        return playerWatcherTask != null && !playerWatcherTask.isCancelled();
+    public boolean isNotFollowing(){
+        return playerWatcherTask == null || playerWatcherTask.isCancelled();
     }
 
     public boolean isFollowingPlayer(Player player){

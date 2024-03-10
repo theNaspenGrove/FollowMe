@@ -68,7 +68,7 @@ public class CommandHandler implements CommandExecutor {
             return true;
         }else if(command.getName().equalsIgnoreCase("followme")){
             metaHelper.clearMetaValue((Player) sender, dontFollowMe);
-            sender.sendMessage("NasPanoptiCam will now select you as a target.");
+            followerWatcher.sendPrivateMessage((Player) sender, "I will now select you as a target.");
             return true;
         }
         return false;
@@ -82,7 +82,7 @@ public class CommandHandler implements CommandExecutor {
         if(followerWatcher.getPlayerFollower().isFollowingPlayer(player)){
             followerWatcher.getPlayerFollower().stopFollowing();
         }
-        player.sendMessage("NasPanoptiCam will no longer select you as a target.");
+        followerWatcher.sendPrivateMessage(player,"I will no longer select you as a target.");
         metaHelper.setMetaValue((Player) player, dontFollowMe, "true");
     }
 
