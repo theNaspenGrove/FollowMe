@@ -16,7 +16,7 @@ import static mov.naspen.naspanopticam.helpers.command.CommandHandler.dontFollow
 public class FollowerWatcher {
     private Player thisPlayerFollows;
     private BukkitTask task;
-    private PlayerFollower playerFollower;
+    private final PlayerFollower playerFollower;
     private final LocationFollower locationFollower;
 
     public FollowerWatcher(){
@@ -62,7 +62,7 @@ public class FollowerWatcher {
             if (canFollow(Bukkit.getServer().getPlayer(configHelper.getFollowThisUUID()))) {
                 Player p = Bukkit.getServer().getPlayer(configHelper.getFollowThisUUID());
                 playerFollower.followPlayer(p);
-            } else if (playerFollower.isNotFollowing() && getValidPlayers().findAny().isPresent()) {
+            } else if (playerFollower.isFollowingPlayer() && getValidPlayers().findAny().isPresent()) {
                 //if not check for players
                 Player[] validPlayers = getValidPlayers().toArray(Player[]::new);
                 int rnd = new Random().nextInt(validPlayers.length);
@@ -84,8 +84,12 @@ public class FollowerWatcher {
         return thisPlayerFollows != null && thisPlayerFollows.isOnline();
     }
 
-    private boolean isPlayerAFK(Player player){
-        return configHelper.useEssentials && ess.getUser(player).isAfk();
+    public static boolean isActive(Player player) {
+        return player.isOnline() && (configHelper.useEssentials && !(ess.getUser(player).isAfk()));
+    }
+
+    private boolean canFollow(Player player){
+        return player != null && isActive(player) && metaHelper.getMetaValue(player, dontFollowMe) == null;
     }
 
     public Player getThisPlayerFollows() {
@@ -96,10 +100,6 @@ public class FollowerWatcher {
         Player[] ps = Bukkit.getServer().getOnlinePlayers().toArray(new Player[0]);
         Collection<Player> invalidPlayers = Arrays.asList(Bukkit.getServer().getPlayer(configHelper.getFollowerUUID()), Bukkit.getServer().getPlayer(configHelper.getFollowThisUUID()));
         return Arrays.stream(ps).filter(p -> !invalidPlayers.contains(p) && canFollow(p));
-    }
-
-    private boolean canFollow(Player player){
-        return player != null && player.isOnline() && !isPlayerAFK(player) && metaHelper.getMetaValue(player, dontFollowMe) == null;
     }
 
     public void sendPrivateMessage(Player player, String s){

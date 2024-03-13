@@ -41,12 +41,7 @@ public class LocationFollower {
     }
 
     public boolean isFollowing() {
-        if(locationFollowerTask == null){
-            return false;
-        } else if(locationFollowerTask.isCancelled()){
-            return false;
-        }
-        return true;
+        return locationFollowerTask != null && !locationFollowerTask.isCancelled();
     }
 
     public void stopFollowing() {
@@ -55,7 +50,7 @@ public class LocationFollower {
     }
 
     public boolean tick() {
-        return this.tick > this.maxTick;
+        return this.tick >= this.maxTick;
     }
 
     public void followLocation(LocationTarget locationTarget) {

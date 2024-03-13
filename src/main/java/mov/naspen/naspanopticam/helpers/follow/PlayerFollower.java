@@ -23,46 +23,50 @@ public class PlayerFollower {
         if(playerTarget == null || playerTarget.getFollowThisPlayer() != player){
             int maxTick = (new Random().nextInt(configHelper.getMaxTimePerLocationInTicks() - minTick) + minTick);
             playerTarget = new PlayerTarget(player, maxTick);
+
             if(followerWatcher.getLocationFollower().isFollowing()){
                 followerWatcher.getLocationFollower().stopFollowing();
             }
             this.startFollowing();
+        }else{
+            if(isNotAttached(followerWatcher.getThisPlayerFollows(), player)){
+                logHelper.sendLogInfo("Reattaching to player '" + player.getName() + "' because the player is not attached or too far away.");
+                this.spectate(followerWatcher.getThisPlayerFollows(),player);
+            }
         }
-        if(isNotAttached(followerWatcher.getThisPlayerFollows(), player)){
-            logHelper.sendLogInfo("Reattaching to player '" + player.getName() + "' because the player is not attached or too far away.");
-            this.spectate(followerWatcher.getThisPlayerFollows(),player);
-        }
+
     }
 
     private void startFollowing() {
         //Start following the player
-        followerWatcher.sendPrivateMessage(getPlayerToFollow(),"I am watching you...");
-        followerWatcher.sendPrivateMessage(getPlayerToFollow(),"You can opt out using /dontfollowme");
+        followerWatcher.sendPrivateMessage(playerTarget.getFollowThisPlayer(),"I am watching you...");
+        followerWatcher.sendPrivateMessage(playerTarget.getFollowThisPlayer(),"You can opt out using /dontfollowme");
         logHelper.sendLogInfo("Following player '" + playerTarget.getFollowThisPlayer().getName() + "'.");
         this.spectate(followerWatcher.getThisPlayerFollows(),playerTarget.getFollowThisPlayer());
         this.playerWatcherTask = new BukkitRunnable(){
             @Override
             public void run() {
                 //Check if the player is still online
-                if(playerTarget.tick() || !followerWatcher.isPlayerFollowerOnline()){
+                if(playerTarget.tick()){
                     stopFollowing();
                 }
             }
         }.runTaskTimer(plugin, 0, 1);
     }
 
-    public Player getPlayerToFollow(){
-        return playerTarget.getFollowThisPlayer();
-    }
-
     public void stopFollowing(){
-        followerWatcher.sendPrivateMessage(getPlayerToFollow(),"I am no longer watching you.");
+        followerWatcher.sendPrivateMessage(playerTarget.getFollowThisPlayer(),"I am no longer watching you.");
         logHelper.sendLogInfo("Stopped following player '" + playerTarget.getFollowThisPlayer().getName() + "'.");
+        this.playerTarget = null;
         this.dismount(followerWatcher.getThisPlayerFollows());
         playerWatcherTask.cancel();
     }
 
-    public boolean isNotFollowing(){
+    public Player getFollowThisPlayer(){
+        return playerTarget.getFollowThisPlayer();
+    }
+
+    public boolean isFollowingPlayer(){
         return playerWatcherTask == null || playerWatcherTask.isCancelled();
     }
 
@@ -79,9 +83,7 @@ public class PlayerFollower {
     }
 
     public void dismount(Player thisPlayerFollows){
-        if(thisPlayerFollows.getSpectatorTarget() != null){
-            thisPlayerFollows.setSpectatorTarget(null);
-        }
+        thisPlayerFollows.setSpectatorTarget(null);
     }
 
     private boolean isNotAttached(Player spectator, Player target){
