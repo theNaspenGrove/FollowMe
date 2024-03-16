@@ -62,7 +62,7 @@ public class FollowerWatcher {
             if (canFollow(Bukkit.getServer().getPlayer(configHelper.getFollowThisUUID()))) {
                 Player p = Bukkit.getServer().getPlayer(configHelper.getFollowThisUUID());
                 playerFollower.followPlayer(p);
-            } else if (playerFollower.isFollowingPlayer() && getValidPlayers().findAny().isPresent()) {
+            } else if (getValidPlayers().findAny().isPresent()) {
                 //if not check for players
                 Player[] validPlayers = getValidPlayers().toArray(Player[]::new);
                 int rnd = new Random().nextInt(validPlayers.length);
@@ -85,24 +85,26 @@ public class FollowerWatcher {
     }
 
     public static boolean isActive(Player player) {
-        return player.isOnline() && (configHelper.useEssentials && !(ess.getUser(player).isAfk()));
+        return player != null && player.isOnline() && (configHelper.useEssentials && !(ess.getUser(player).isAfk()));
     }
 
     private boolean canFollow(Player player){
-        return player != null && isActive(player) && metaHelper.getMetaValue(player, dontFollowMe) == null;
+        return isActive(player) && metaHelper.getMetaValue(player, dontFollowMe) == null;
     }
 
     public Player getThisPlayerFollows() {
         return thisPlayerFollows;
     }
 
-    private Stream<Player> getValidPlayers(){
+    Stream<Player> getValidPlayers(){
         Player[] ps = Bukkit.getServer().getOnlinePlayers().toArray(new Player[0]);
         Collection<Player> invalidPlayers = Arrays.asList(Bukkit.getServer().getPlayer(configHelper.getFollowerUUID()), Bukkit.getServer().getPlayer(configHelper.getFollowThisUUID()));
         return Arrays.stream(ps).filter(p -> !invalidPlayers.contains(p) && canFollow(p));
     }
 
     public void sendPrivateMessage(Player player, String s){
-        thisPlayerFollows.chat("/msg " + player.getName() + " " + s);
+        if(player != null && player.isOnline()){
+            thisPlayerFollows.chat("/msg " + player.getName() + " " + s);
+        }
     }
 }

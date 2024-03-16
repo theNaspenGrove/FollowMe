@@ -6,9 +6,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
+import javax.annotation.Nullable;
 import java.util.Random;
 
 import static mov.naspen.naspanopticam.NasPanoptiCam.*;
+import static mov.naspen.naspanopticam.helpers.follow.FollowerWatcher.isActive;
 
 public class PlayerFollower {
 
@@ -19,19 +21,29 @@ public class PlayerFollower {
     public PlayerFollower(FollowerWatcher followerWatcher){
         this.followerWatcher = followerWatcher;
     }
-    public void followPlayer(Player player){
-        if(playerTarget == null || playerTarget.getFollowThisPlayer() != player){
+    public void followPlayer(Player playerToFollow){
+        //The player target is null when the follower is first created
+        //Follow this player not being equal to the player to be followed should be the only condition to start following a new player
+        if(playerTarget == null || playerTarget.getFollowThisPlayer() != playerToFollow){
+            if(playerTarget != null){
+                stopFollowing();
+            }
             int maxTick = (new Random().nextInt(configHelper.getMaxTimePerLocationInTicks() - minTick) + minTick);
-            playerTarget = new PlayerTarget(player, maxTick);
+            //create a new player target with the playerToFollow and the maxTick calculated above
+            playerTarget = new PlayerTarget(playerToFollow, maxTick);
 
+            //If the location follower is running, stop it
             if(followerWatcher.getLocationFollower().isFollowing()){
                 followerWatcher.getLocationFollower().stopFollowing();
             }
+            //Start this player follower
             this.startFollowing();
         }else{
-            if(isNotAttached(followerWatcher.getThisPlayerFollows(), player)){
-                logHelper.sendLogInfo("Reattaching to player '" + player.getName() + "' because the player is not attached or too far away.");
-                this.spectate(followerWatcher.getThisPlayerFollows(),player);
+            //If the player follower is already running with the correct player, check for attachment. If the player is not attached, reattach
+            if(isNotAttached(followerWatcher.getThisPlayerFollows(), playerToFollow)){
+                if(!playerTarget.getPlayerName().isBlank())
+                    logHelper.sendLogInfo("Reattaching to player '" + playerToFollow.getName() + "' because the player is not attached or too far away.");
+                this.spectate(followerWatcher.getThisPlayerFollows(),playerToFollow);
             }
         }
 
@@ -41,14 +53,23 @@ public class PlayerFollower {
         //Start following the player
         followerWatcher.sendPrivateMessage(playerTarget.getFollowThisPlayer(),"I am watching you...");
         followerWatcher.sendPrivateMessage(playerTarget.getFollowThisPlayer(),"You can opt out using /dontfollowme");
-        logHelper.sendLogInfo("Following player '" + playerTarget.getFollowThisPlayer().getName() + "'.");
+        if(!playerTarget.getPlayerName().isBlank())
+            logHelper.sendLogInfo("Following player '" + playerTarget.getPlayerName() + " for " + playerTarget.getMaxTick() + " at " + playerTarget.getTimeStartedFollowing() + "'.");
         this.spectate(followerWatcher.getThisPlayerFollows(),playerTarget.getFollowThisPlayer());
         this.playerWatcherTask = new BukkitRunnable(){
             @Override
             public void run() {
                 //Check if the player is still online
                 if(playerTarget.tick()){
-                    stopFollowing();
+                    if(playerTarget.getFollowThisPlayer() == Bukkit.getServer().getPlayer(configHelper.getFollowThisUUID())){
+                        if(!isActive(playerTarget.getFollowThisPlayer())){
+                            stopFollowing();
+                        }
+                        return;
+                    }
+                    if(followerWatcher.getValidPlayers().noneMatch(p -> p == playerTarget.getFollowThisPlayer())){
+                        stopFollowing();
+                    }
                 }
             }
         }.runTaskTimer(plugin, 0, 1);
@@ -56,9 +77,13 @@ public class PlayerFollower {
 
     public void stopFollowing(){
         followerWatcher.sendPrivateMessage(playerTarget.getFollowThisPlayer(),"I am no longer watching you.");
-        logHelper.sendLogInfo("Stopped following player '" + playerTarget.getFollowThisPlayer().getName() + "'.");
-        this.playerTarget = null;
+        if(!playerTarget.getPlayerName().isBlank())
+            logHelper.sendLogInfo("Stopped following player '" + playerTarget.getPlayerName() + "'.");
+        //dismount the current player target
         this.dismount(followerWatcher.getThisPlayerFollows());
+        //Set the player target to null and the max time to 0
+        //With a null target and a 0 max time, this target will never be followed
+        this.playerTarget = new PlayerTarget(null, 0);
         playerWatcherTask.cancel();
     }
 
