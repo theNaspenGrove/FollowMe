@@ -14,61 +14,87 @@ public class CommandHandler implements CommandExecutor {
     public static AspenMetaKey dontFollowMe = new AspenMetaKey("dontFollowMe");
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
-        if(!(sender instanceof Player)){
-            return false;
-        }
         if(command.getName().equalsIgnoreCase("naspanopticam")){
-            if(args.length == 0){
-                metaHelper.clearMetaValue((Player) sender, dontFollowMe);
-                return true;
-            } else {
-                switch (args[0].toLowerCase()) {
-                    case "add" -> {
-                        if(!sender.hasPermission("naspanopticam.add")){
+            switch (args[0].toLowerCase()) {
+                case "add" -> {
+                    if(!(sender instanceof Player)){
+                        sender.sendMessage("This command can only be used by a player");
+                        return false;
+                    }
+                    if(!sender.hasPermission("naspanopticam.add")){
+                        sender.sendMessage("You do not have permission to use this command");
+                        return false;
+                    }
+                    if (args.length > 1 && args[1].equals("location")) {
+                        if(!sender.hasPermission("naspanopticam.add.location")){
                             sender.sendMessage("You do not have permission to use this command");
                             return false;
                         }
-                        if (args.length > 1 && args[1].equals("location")) {
-                            if(!sender.hasPermission("naspanopticam.add.location")){
-                                sender.sendMessage("You do not have permission to use this command");
-                                return false;
-                            }
-                            if (args.length == 9 && parseArgs(args)) {
-                                configHelper.addFallbackLocation(parseLocation(sender, args), Double.parseDouble(args[5]), Integer.parseInt(args[6]), Double.parseDouble(args[7]) / 20f, Boolean.parseBoolean(args[8]));
-                                sender.sendMessage("Added location to the list of locations");
-                                return true;
-                            } else {
-                                sender.sendMessage("usage /naspanopticam add location <X> <Y> <Z> <radius> <yOffset> <radPerSec> <invertedLook>");
-                                return false;
-                            }
-                        }
-                    }
-                    case "reload" -> {
-                        if(!sender.hasPermission("naspanopticam.reload")){
-                            sender.sendMessage("You do not have permission to use this command");
+                        if (args.length == 9 && parseArgs(args)) {
+                            configHelper.addFallbackLocation(parseLocation(sender, args), Double.parseDouble(args[5]), Integer.parseInt(args[6]), Double.parseDouble(args[7]) / 20f, Boolean.parseBoolean(args[8]));
+                            sender.sendMessage("Added location to the list of locations");
+                            return true;
+                        } else {
+                            sender.sendMessage("usage /naspanopticam add location <X> <Y> <Z> <radius> <yOffset> <radPerSec> <invertedLook>");
                             return false;
                         }
-                        configHelper.reloadConfig();
-                        sender.sendMessage("Reloaded the NasPanoptiCam config");
+                    }
+                }
+                case "reload" -> {
+                    if(!sender.hasPermission("naspanopticam.reload")){
+                        sender.sendMessage("You do not have permission to use this command");
+                        return false;
+                    }
+                    configHelper.reloadConfig();
+                    sender.sendMessage("Reloaded the NasPanoptiCam config");
+                    return true;
+                }
+                case "followme" -> {
+                    if(!(sender instanceof Player)){
+                        sender.sendMessage("This command can only be used by a player");
                         return true;
                     }
-                    case "followme" -> {
-                        metaHelper.clearMetaValue((Player) sender, dontFollowMe);
-                        sender.sendMessage("NasPanoptiCam will now select you as a target.");
+                    metaHelper.clearMetaValue((Player) sender, dontFollowMe);
+                    sender.sendMessage("NasPanoptiCam will now select you as a target.");
+                    return true;
+                }
+                case "dontfollowme" -> {
+                    if(!(sender instanceof Player)){
+                        sender.sendMessage("This command can only be used by a player");
                         return true;
                     }
-                    case "dontfollowme" -> {
-                        dontFollowPlayer((Player) sender);
+                    dontFollowPlayer((Player) sender);
+                    return true;
+                }
+                case "dumpsessions" -> {
+                    if(!sender.hasPermission("naspanopticam.dump")){
+                        sender.sendMessage("You do not have permission to use this command");
+                        return false;
+                    }
+                    if(followerWatcher.getPlayerFollower().dumpSessions()){
+                        sender.sendMessage("Dumped player target sessions to file");
                         return true;
+                    }else{
+                        sender.sendMessage("Failed to dump player target sessions to file!");
+                        sender.sendMessage("Check the server log for more information");
+                        return false;
                     }
                 }
             }
         }else if(command.getName().equalsIgnoreCase("dontfollowme")){
-            dontFollowPlayer((Player) sender);
+            if(sender instanceof Player){
+                dontFollowPlayer((Player) sender);
+            }else{
+                sender.sendMessage("This command can only be used by a player");
+            }
             return true;
         }else if(command.getName().equalsIgnoreCase("followme")){
-            metaHelper.clearMetaValue((Player) sender, dontFollowMe);
-            followerWatcher.sendPrivateMessage((Player) sender, "I will now select you as a target.");
+            if(sender instanceof Player){
+                metaHelper.clearMetaValue((Player) sender, dontFollowMe);
+                followerWatcher.sendPrivateMessage((Player) sender, "I will now select you as a target.");
+            }else{
+                sender.sendMessage("This command can only be used by a player");
+            }
             return true;
         }
         return false;

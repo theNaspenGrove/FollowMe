@@ -1,22 +1,31 @@
 package mov.naspen.naspanopticam.helpers.follow;
 
 import mov.naspen.naspanopticam.helpers.target.PlayerTarget;
+import mov.naspen.naspanopticam.helpers.target.PlayerTargetSession;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-import javax.annotation.Nullable;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.lang.reflect.Array;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.Random;
 
 import static mov.naspen.naspanopticam.NasPanoptiCam.*;
 import static mov.naspen.naspanopticam.helpers.follow.FollowerWatcher.isActive;
 
 public class PlayerFollower {
-
     FollowerWatcher followerWatcher;
     PlayerTarget playerTarget;
     final int minTick = configHelper.getMaxTimePerLocationInTicks() / 2;
+    //playerTargetSessions is an array of all the player targets that have been followed
+    ArrayList<PlayerTargetSession> playerTargetSessions = new ArrayList<>();
     private BukkitTask playerWatcherTask;
     public PlayerFollower(FollowerWatcher followerWatcher){
         this.followerWatcher = followerWatcher;
@@ -54,7 +63,7 @@ public class PlayerFollower {
         followerWatcher.sendPrivateMessage(playerTarget.getFollowThisPlayer(),"I am watching you...");
         followerWatcher.sendPrivateMessage(playerTarget.getFollowThisPlayer(),"You can opt out using /dontfollowme");
         if(!playerTarget.getPlayerName().isBlank())
-            logHelper.sendLogInfo("Following player '" + playerTarget.getPlayerName() + " for " + playerTarget.getMaxTick() + " at " + playerTarget.getTimeStartedFollowing() + "'.");
+            logHelper.sendLogInfo("Following player '" + playerTarget.getPlayerName() + "' for " + playerTarget.getMaxTick() + " at " + playerTarget.getTimeStartedFollowing() + " UTC .");
         this.spectate(followerWatcher.getThisPlayerFollows(),playerTarget.getFollowThisPlayer());
         this.playerWatcherTask = new BukkitRunnable(){
             @Override
@@ -76,9 +85,13 @@ public class PlayerFollower {
     }
 
     public void stopFollowing(){
-        followerWatcher.sendPrivateMessage(playerTarget.getFollowThisPlayer(),"I am no longer watching you.");
-        if(!playerTarget.getPlayerName().isBlank())
-            logHelper.sendLogInfo("Stopped following player '" + playerTarget.getPlayerName() + "'.");
+        if(!playerTarget.getPlayerName().isBlank()){
+            followerWatcher.sendPrivateMessage(playerTarget.getFollowThisPlayer(),"I am no longer watching you.");
+            int now = (int) (Instant.now().getEpochSecond());
+            int timeFollowing = now - playerTarget.getTimeStartedFollowing();
+            logHelper.sendLogInfo("Stopped following player '" + playerTarget.getPlayerName() + "' at " + now + " UTC. Followed for " + timeFollowing + " seconds.");
+            saveActiveSession(now);
+        }
         //dismount the current player target
         this.dismount(followerWatcher.getThisPlayerFollows());
         //Set the player target to null and the max time to 0
@@ -87,6 +100,41 @@ public class PlayerFollower {
         playerWatcherTask.cancel();
     }
 
+    private void saveActiveSession(){
+        if(playerTarget != null){
+            int now = (int) (Instant.now().getEpochSecond());
+            saveActiveSession(now);
+        }
+    }
+    private void saveActiveSession(int now){
+        if(playerTarget != null){
+            int timeFollowing = now - playerTarget.getTimeStartedFollowing();
+            playerTargetSessions.add(new PlayerTargetSession(playerTarget.getFollowThisPlayer().getName(), playerTarget.getTimeStartedFollowing(), now, timeFollowing));
+            if(playerTarget.getFollowThisPlayer().isOnline())
+                playerTarget.resetStartedFollowTime();
+        }
+    }
+
+    public boolean dumpSessions(){
+        saveActiveSession();
+        BufferedWriter writer;
+        ArrayList<PlayerTargetSession> playerTargetSessionsDump = new ArrayList<>(this.playerTargetSessions);
+        this.playerTargetSessions.clear();
+        try {
+            writer = new BufferedWriter(new FileWriter(plugin.getDataFolder().getAbsoluteFile() + File.separator + "NasPanoptiCamSessions.txt"));
+            for (PlayerTargetSession session : playerTargetSessionsDump) {
+                writer.write(session.getPlayerFollowed() + " " + session.getTimeStarted() + " " + session.getTimeStopped() + " " + session.getTimeFollowed());
+                writer.newLine();
+            }
+            writer.flush();
+            writer.close();
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
     public Player getFollowThisPlayer(){
         return playerTarget.getFollowThisPlayer();
     }
