@@ -119,9 +119,8 @@ public class PlayerFollower {
         thisPlayerFollows.teleport(targetPlayer);
         Bukkit.getScheduler().runTaskLater(plugin, () ->
                         thisPlayerFollows.setSpectatorTarget(targetPlayer),
-                4);
+                6);
     }
-
     public void dismount(Player thisPlayerFollows){
         thisPlayerFollows.setSpectatorTarget(null);
     }
