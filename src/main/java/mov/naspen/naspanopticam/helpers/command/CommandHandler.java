@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import static mov.naspen.naspanopticam.NasPanoptiCam.*;
+import static mov.naspen.naspanopticam.helpers.TrackedSessionManager.dumpSessions;
 
 public class CommandHandler implements CommandExecutor {
     public static AspenMetaKey dontFollowMe = new AspenMetaKey("dontFollowMe");
@@ -71,7 +72,7 @@ public class CommandHandler implements CommandExecutor {
                         sender.sendMessage("You do not have permission to use this command");
                         return false;
                     }
-                    if(followerWatcher.getPlayerFollower().dumpSessions()){
+                    if(dumpSessions()){
                         sender.sendMessage("Dumped player target sessions to file");
                         return true;
                     }else{

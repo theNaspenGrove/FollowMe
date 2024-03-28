@@ -7,17 +7,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.lang.reflect.Array;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
 import java.util.Random;
 
 import static mov.naspen.naspanopticam.NasPanoptiCam.*;
+import static mov.naspen.naspanopticam.NasPanoptiCam.followerWatcher;
+import static mov.naspen.naspanopticam.helpers.TrackedSessionManager.saveSession;
 import static mov.naspen.naspanopticam.helpers.follow.FollowerWatcher.isActive;
 
 public class PlayerFollower {
@@ -25,7 +20,7 @@ public class PlayerFollower {
     PlayerTarget playerTarget;
     final int minTick = configHelper.getMaxTimePerLocationInTicks() / 2;
     //playerTargetSessions is an array of all the player targets that have been followed
-    ArrayList<PlayerTargetSession> playerTargetSessions = new ArrayList<>();
+    PlayerTargetSession activePlayerTargetSession;
     private BukkitTask playerWatcherTask;
     public PlayerFollower(FollowerWatcher followerWatcher){
         this.followerWatcher = followerWatcher;
@@ -90,7 +85,10 @@ public class PlayerFollower {
             int now = (int) (Instant.now().getEpochSecond());
             int timeFollowing = now - playerTarget.getTimeStartedFollowing();
             logHelper.sendLogInfo("Stopped following player '" + playerTarget.getPlayerName() + "' at " + now + " UTC. Followed for " + timeFollowing + " seconds.");
-            saveActiveSession(now);
+            saveSession(new PlayerTargetSession(
+                    followerWatcher.getPlayerFollower().getPlayerTarget().getPlayerName(),
+                    followerWatcher.getPlayerFollower().getPlayerTarget().getTimeStartedFollowing(),
+                    now));
         }
         //dismount the current player target
         this.dismount(followerWatcher.getThisPlayerFollows());
@@ -99,52 +97,21 @@ public class PlayerFollower {
         this.playerTarget = new PlayerTarget(null, 0);
         playerWatcherTask.cancel();
     }
-
-    private void saveActiveSession(){
-        if(playerTarget != null){
-            int now = (int) (Instant.now().getEpochSecond());
-            saveActiveSession(now);
-        }
-    }
-    private void saveActiveSession(int now){
-        if(playerTarget != null){
-            int timeFollowing = now - playerTarget.getTimeStartedFollowing();
-            playerTargetSessions.add(new PlayerTargetSession(playerTarget.getFollowThisPlayer().getName(), playerTarget.getTimeStartedFollowing(), now, timeFollowing));
-            if(playerTarget.getFollowThisPlayer().isOnline())
-                playerTarget.resetStartedFollowTime();
-        }
-    }
-
-    public boolean dumpSessions(){
-        saveActiveSession();
-        BufferedWriter writer;
-        ArrayList<PlayerTargetSession> playerTargetSessionsDump = new ArrayList<>(this.playerTargetSessions);
-        this.playerTargetSessions.clear();
-        try {
-            writer = new BufferedWriter(new FileWriter(plugin.getDataFolder().getAbsoluteFile() + File.separator + "NasPanoptiCamSessions.txt"));
-            for (PlayerTargetSession session : playerTargetSessionsDump) {
-                writer.write(session.getPlayerFollowed() + " " + session.getTimeStarted() + " " + session.getTimeStopped() + " " + session.getTimeFollowed());
-                writer.newLine();
-            }
-            writer.flush();
-            writer.close();
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
     
     public Player getFollowThisPlayer(){
         return playerTarget.getFollowThisPlayer();
     }
 
     public boolean isFollowingPlayer(){
-        return playerWatcherTask == null || playerWatcherTask.isCancelled();
+        return  playerWatcherTask != null && !playerWatcherTask.isCancelled();
     }
 
     public boolean isFollowingPlayer(Player player){
         return playerTarget != null && playerTarget.getFollowThisPlayer() == player;
+    }
+
+    public PlayerTarget getPlayerTarget(){
+        return playerTarget;
     }
 
     public void spectate(Player thisPlayerFollows, Player targetPlayer) {
