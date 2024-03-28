@@ -12,25 +12,25 @@ import static mov.naspen.naspanopticam.NasPanoptiCam.followerWatcher;
 import static mov.naspen.naspanopticam.NasPanoptiCam.plugin;
 
 public class TrackedSessionManager {
-
+    final static int minSessionTime = 120;
     private static final String fileName = plugin.getDataFolder().getAbsoluteFile() + File.separator + "NasPanoptiCamSessions.txt";
-
     public static boolean saveSession(PlayerTargetSession session){
-        BufferedWriter writer;
-        try {
-            writer = new BufferedWriter(new FileWriter(fileName, true));
-            writer.write(session.toString());
-            writer.newLine();
-            writer.flush();
-            writer.close();
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
+        boolean success = true;
+        if(session.getTimeFollowed() > minSessionTime){
+            BufferedWriter writer;
+            try {
+                writer = new BufferedWriter(new FileWriter(fileName, true));
+                writer.write(session.toString());
+                writer.newLine();
+                writer.flush();
+                writer.close();
+            } catch (IOException e) {
+                success = false;
+                e.printStackTrace();
+            }
         }
-
+        return success;
     }
-
     public static boolean dumpSessions(){
         boolean success = false;
         BufferedWriter writer;
@@ -38,13 +38,16 @@ public class TrackedSessionManager {
         try {
             writer = new BufferedWriter(new FileWriter(fileName, true));
             if(followerWatcher.getPlayerFollower().isFollowingPlayer()){
+
                 PlayerTargetSession session = new PlayerTargetSession(
                         followerWatcher.getPlayerFollower().getPlayerTarget().getPlayerName(),
                         followerWatcher.getPlayerFollower().getPlayerTarget().getTimeStartedFollowing(),
                         now);
-                writer.write(session.toString());
-                writer.newLine();
-                followerWatcher.getPlayerFollower().getPlayerTarget().setStartedFollowTime(now);
+                if(session.getTimeFollowed() > minSessionTime){
+                    writer.write(session.toString());
+                    writer.newLine();
+                    followerWatcher.getPlayerFollower().getPlayerTarget().setStartedFollowTime(now);
+                }
             }
             writer.write("Dumped at: " + now);
             writer.newLine();
