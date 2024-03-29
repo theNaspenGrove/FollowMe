@@ -110,7 +110,7 @@ public class CommandHandler implements CommandExecutor {
             followerWatcher.getPlayerFollower().stopFollowing();
         }
         followerWatcher.sendPrivateMessage(player,"I will no longer select you as a target.");
-        metaHelper.setMetaValue((Player) player, dontFollowMe, "true");
+        metaHelper.setMetaValue(player, dontFollowMe, "true");
     }
 
     private boolean parseArgs(String[] args) {

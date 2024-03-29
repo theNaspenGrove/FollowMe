@@ -18,13 +18,11 @@ public class FollowerWatcher {
     private BukkitTask task;
     private final PlayerFollower playerFollower;
     private final LocationFollower locationFollower;
-
     public FollowerWatcher(){
         playerFollower = new PlayerFollower(this);
         locationFollower = new LocationFollower(this);
         watch();
     }
-
     public void watch(){
         if(task == null || task.isCancelled()){
             task = new BukkitRunnable() {
@@ -39,21 +37,17 @@ public class FollowerWatcher {
             }.runTaskTimer(plugin, 0, 10);
         }
     }
-
     public PlayerFollower getPlayerFollower() {
         return playerFollower;
     }
-
     public LocationFollower getLocationFollower() {
         return locationFollower;
     }
-
     public void stopWatching(){
         if(task != null && !task.isCancelled()){
             task.cancel();
         }
     }
-
     private void tick() {
         thisPlayerFollows = Bukkit.getServer().getPlayer(configHelper.getFollowerUUID());
         //if follower is online
@@ -79,32 +73,30 @@ public class FollowerWatcher {
             }
         }
     }
-
     public boolean isPlayerFollowerOnline(){
         return thisPlayerFollows != null && thisPlayerFollows.isOnline();
     }
-
     public static boolean isActive(Player player) {
         return player != null && player.isOnline() && (configHelper.useEssentials && !(ess.getUser(player).isAfk()));
     }
-
     private boolean canFollow(Player player){
         return isActive(player) && metaHelper.getMetaValue(player, dontFollowMe) == null;
     }
-
     public Player getThisPlayerFollows() {
         return thisPlayerFollows;
     }
-
     Stream<Player> getValidPlayers(){
         Player[] ps = Bukkit.getServer().getOnlinePlayers().toArray(new Player[0]);
         Collection<Player> invalidPlayers = Arrays.asList(Bukkit.getServer().getPlayer(configHelper.getFollowerUUID()), Bukkit.getServer().getPlayer(configHelper.getFollowThisUUID()));
         return Arrays.stream(ps).filter(p -> !invalidPlayers.contains(p) && canFollow(p));
     }
-
     public void sendPrivateMessage(Player player, String s){
-        if(player != null && player.isOnline()){
-            thisPlayerFollows.chat("/msg " + player.getName() + " " + s);
-        }
+        //wait 8 ticks and check if the player is still online, then send the messages
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if(player != null && player.isOnline()){
+                thisPlayerFollows.chat("/msg " + player.getName() + " " + s);
+            }
+        }, 8);
+
     }
 }

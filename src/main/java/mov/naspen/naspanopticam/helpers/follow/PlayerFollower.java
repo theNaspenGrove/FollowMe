@@ -11,7 +11,6 @@ import java.time.Instant;
 import java.util.Random;
 
 import static mov.naspen.naspanopticam.NasPanoptiCam.*;
-import static mov.naspen.naspanopticam.NasPanoptiCam.followerWatcher;
 import static mov.naspen.naspanopticam.helpers.TrackedSessionManager.saveSession;
 import static mov.naspen.naspanopticam.helpers.follow.FollowerWatcher.isActive;
 
@@ -19,8 +18,6 @@ public class PlayerFollower {
     FollowerWatcher followerWatcher;
     PlayerTarget playerTarget;
     final int minTick = configHelper.getMaxTimePerLocationInTicks() / 2;
-    //playerTargetSessions is an array of all the player targets that have been followed
-    PlayerTargetSession activePlayerTargetSession;
     private BukkitTask playerWatcherTask;
     public PlayerFollower(FollowerWatcher followerWatcher){
         this.followerWatcher = followerWatcher;
@@ -78,8 +75,8 @@ public class PlayerFollower {
             }
         }.runTaskTimer(plugin, 0, 1);
     }
-
     public void stopFollowing(){
+        //if there's no defined playerName in the player target, assume that there was no previous target
         if(!playerTarget.getPlayerName().isBlank()){
             followerWatcher.sendPrivateMessage(playerTarget.getFollowThisPlayer(),"I am no longer watching you.");
             int now = (int) (Instant.now().getEpochSecond());
@@ -97,11 +94,9 @@ public class PlayerFollower {
         this.playerTarget = new PlayerTarget(null, 0);
         playerWatcherTask.cancel();
     }
-    
     public Player getFollowThisPlayer(){
         return playerTarget.getFollowThisPlayer();
     }
-
     public boolean isFollowingPlayer(){
         return  playerWatcherTask != null && !playerWatcherTask.isCancelled();
     }
@@ -109,7 +104,6 @@ public class PlayerFollower {
     public boolean isFollowingPlayer(Player player){
         return playerTarget != null && playerTarget.getFollowThisPlayer() == player;
     }
-
     public PlayerTarget getPlayerTarget(){
         return playerTarget;
     }

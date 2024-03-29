@@ -17,11 +17,14 @@ commands:
 
 permissions:
     aspanopticam.add:
-        description: ability to use the add command
-        default: false
+        description: ability to use the add sub-command
+        default: op
     naspanopticam.add.location:
-        description: ability to use the add location command
-        default: false
+        description: ability to use the add location sub-sub-command
+        default: op
     naspanopticam.reload:
-        description: ability to use the reload command
-        default: false
+        description: ability to use the reload sub-command
+        default: op
+    naspanopticam.dump:
+        description: ability to use the dumpsessions  sub-command
+        default: op

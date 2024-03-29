@@ -28,7 +28,9 @@ public class LocationFollower {
         locationFollowerTask = new BukkitRunnable(){
             @Override
             public void run() {
+                //only run the task if the player is online
                 if(followerWatcher.isPlayerFollowerOnline()){
+                    //update the location of the player to follow using the location target
                     Location loc = locationTarget.getLocationAroundCircle(tick++);
                     followerWatcher.getThisPlayerFollows().setVelocity(new Vector(1, 0, 0));
                     followerWatcher.getThisPlayerFollows().teleport(loc);

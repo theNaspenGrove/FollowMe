@@ -22,6 +22,9 @@ public class TabCompleteHandler implements TabCompleter {
                     if (p.hasPermission("naspanopticam.reload")) {
                         cl.add("reload");
                     }
+                    if (p.hasPermission("naspanopticam.dump")) {
+                        cl.add("dumpsessions");
+                    }
                     cl.add("followme");
                     cl.add("dontfollowme");
                     return cl;

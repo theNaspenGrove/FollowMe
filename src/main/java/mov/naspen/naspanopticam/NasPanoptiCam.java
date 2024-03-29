@@ -43,16 +43,18 @@ public final class NasPanoptiCam extends JavaPlugin {
             configHelper.useEssentials = true;
             logHelper.sendLogInfo("EssentialsX found");
         }
-        logHelper.sendLogInfo(String.valueOf(configHelper.useEssentials));
         followerWatcher = new FollowerWatcher();
 
         this.getServer().getPluginManager().registerEvents(new PlayerJoinEventListener(), this);
         this.getServer().getPluginManager().registerEvents(new PlayerQuitEventListener(), this);
 
+        //register alias commands
         Objects.requireNonNull(this.getCommand("dontfollowme")).setExecutor(new CommandHandler());
         Objects.requireNonNull(this.getCommand("followme")).setExecutor(new CommandHandler());
 
+        //register primary command
         Objects.requireNonNull(this.getCommand("naspanopticam")).setExecutor(new CommandHandler());
+        //register tab completer
         Objects.requireNonNull(this.getCommand("naspanopticam")).setTabCompleter(new TabCompleteHandler());
 
         //create PlaceHolder API expansion
