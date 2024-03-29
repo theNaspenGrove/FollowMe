@@ -6,6 +6,7 @@ import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 
 import static mov.naspen.naspanopticam.NasPanoptiCam.followerWatcher;
+import static mov.naspen.naspanopticam.helpers.TrackedSessionManager.minSessionTime;
 
 public class NasPanoptiPlaceholders extends PlaceholderExpansion {
 
@@ -39,7 +40,15 @@ public class NasPanoptiPlaceholders extends PlaceholderExpansion {
     public String onRequest(OfflinePlayer p, String params) {
         if(params.equalsIgnoreCase("isBeingFollowed")){
             if(!followerWatcher.getPlayerFollower().isFollowingPlayer()) return "false";
-            return p.getUniqueId().equals(followerWatcher.getPlayerFollower().getFollowThisPlayer().getUniqueId()) ? "true" : "false";
+            if(p.getUniqueId().equals(followerWatcher.getPlayerFollower().getFollowThisPlayer().getUniqueId())){
+                if(followerWatcher.getPlayerFollower().getPlayerTarget().getFollowingFor() > minSessionTime){
+                    return "true";
+                }else{
+                    return "true*";
+                }
+            }else{
+                return "false";
+            }
         }
         return null; // Placeholder is unknown by the Expansion
     }

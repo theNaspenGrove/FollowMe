@@ -13,7 +13,7 @@ import static mov.naspen.naspanopticam.NasPanoptiCam.plugin;
 
 public class TrackedSessionManager {
     // The minimum time a session must be followed to be saved when dumped in seconds
-    final static int minSessionTime = 120;
+    public final static int minSessionTime = 120;
     //The file name and path using the plugin's data folder provided by bukkit
     private static final String fileName = plugin.getDataFolder().getAbsoluteFile() + File.separator + "NasPanoptiCamSessions.txt";
     public static void saveSession(PlayerTargetSession session){

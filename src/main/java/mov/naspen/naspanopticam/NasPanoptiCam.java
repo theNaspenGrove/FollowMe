@@ -9,13 +9,17 @@ import mov.naspen.naspanopticam.helpers.target.LocationTarget;
 import mov.naspen.naspanopticam.helpers.NasPanoptiPlaceholders;
 import mov.naspen.naspanopticam.helpers.command.CommandHandler;
 import mov.naspen.naspanopticam.helpers.command.TabCompleteHandler;
+import mov.naspen.naspanopticam.helpers.target.PlayerTargetSession;
 import mov.naspen.periderm.helpers.luckPerms.AspenLuckPermsHelper;
 import mov.naspen.periderm.loging.AspenLogHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.time.Instant;
 import java.util.Objects;
+
+import static mov.naspen.naspanopticam.helpers.TrackedSessionManager.saveSession;
 
 public final class NasPanoptiCam extends JavaPlugin {
 
@@ -69,5 +73,14 @@ public final class NasPanoptiCam extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+        if(followerWatcher != null && followerWatcher.getPlayerFollower().isFollowingPlayer()){
+            int now = (int) (Instant.now().getEpochSecond());
+
+
+            saveSession(new PlayerTargetSession(
+                    followerWatcher.getPlayerFollower().getPlayerTarget().getPlayerName(),
+                    followerWatcher.getPlayerFollower().getPlayerTarget().getTimeStartedFollowing(),
+                    now));
+        }
     }
 }
